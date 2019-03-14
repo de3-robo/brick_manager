@@ -273,5 +273,3 @@ goal_manager_s = rospy.Service('get_place_loc', QueryBrickLoc, goal_manager_serv
 
 
 rospy.spin()
-
-"""hello"""
