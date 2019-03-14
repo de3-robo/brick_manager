@@ -42,7 +42,7 @@ brick Arm Master wants next, and relays back the coordinate and angular position
         resp.wz = p[5]
         return p
 
-This function is found in each of the three coordinate generation functions, which will be explained below.
+The content of this function can be found in each of the three coordinate functions. However, it is no longer used as a standalone function.
 
 The Code's Functions
 -----------------------------------
@@ -56,9 +56,46 @@ The First Function: goal_manager_server
 This first set of brick positions was generated so that the other packages could be tested whilst this one was developed. In essence it is a pre-defined set of
 positions which gets run through in increments of one, as each brick is successfully placed. This 'brick number' is iterated through in the main loop of Arm Master and received through a service in Brick Manager.
 
-The function will be discussed in two halves; the start which
+The function will be discussed in two halves; the start which has an if statement to return the correct brick positions, and the end which uses ``brick_manager_server``and returns the values to Arm Manager.
+The start is as follows::
 
+    def goal_manager_server(req):
 
+        num = req.num                                   # establishing which number was requested
+
+        if num == 0:                                    # if statement to iterate through brick positions
+            p = [0.6, 0, 0.116, 0, 0, 1.57]
+        elif num == 1:
+            p = [0.6, -0.2-0.05, 0.116, 0, 0, 1.57]
+        elif num == 2:
+            p = [0.6, 0.2+0.05, 0.116, 0, 0, 1.57]
+        elif num == 3:
+            p = [0.6, -0.18, 0.176, 0, 0, 1.57]
+        elif num == 4:
+            p = [0.6, +0.18, 0.176, 0, 0, 1.57]
+
+The above code is an extract of the function initialisation and the first few brick positions. As you can see, the function receives a value, which is the 'place number'
+from Arm Master. This is evaluated as a number in line 3 of the extract and the if statement proceeds to select the correct coordinate position.
+
+The second halve, and end of the function, uses the previously discussed brick_manager_server content and creates an output that will be sent back
+to the Arm Master main code via the defined message type, which is ``QueryBrickLoc()``. ``get_pick_loc`` and ``get_place_loc`` are what Arm Master is
+calling for and is what allows the position to be returned to Arm Master.
+
+Finally, ``rospy.spin()`` prevents the python script from closing and allows the packages to continue running. The code can be seen below::
+
+        resp = QueryBrickLocResponse()
+        resp.x = p[0]
+        resp.y = p[1]
+        resp.z = p[2]
+        resp.wx = p[3]
+        resp.wy = p[4]
+        resp.wz = p[5]
+        return resp
+
+    brick_manager_s = rospy.Service('get_pick_loc', QueryBrickLoc, brick_manager_server)
+    goal_manager_s = rospy.Service('get_place_loc', QueryBrickLoc, goal_manager_server)
+
+    rospy.spin()
 
 real_panda
 -----------------------------------

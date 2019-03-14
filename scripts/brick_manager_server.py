@@ -37,22 +37,9 @@ def brick_manager_server(req):
 
 def goal_manager_server(req):
 
-    num = req.num
+    num = req.num                                   # establishing which number was requested
 
-    #p, new = GoalManager.get_next_goal_loc(num)    #SAM DO CODE AND LOGIC IN HERE #Start with one value in here to avoid errors
-    #     # while not new: #Query untill you get a new position
-    #     # rospy.sleep(0.05)
-    """
-    print("GoalManager P: ", p)
-
-    which_brick = QueryBrickLocRequest()
-    print("placed:", which_brick)
-    """
-
-# #########################################################################
-# ###BELOW CODE IS THE ORIGINAL####################
-# ############################################################################
-    if num == 0:
+    if num == 0:                                    # if statement to iterate through brick positions
         p = [0.6, 0, 0.116, 0, 0, 1.57]
     elif num == 1:
         p = [0.6, -0.2-0.05, 0.116, 0, 0, 1.57]
