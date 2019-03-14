@@ -5,8 +5,8 @@ Brick Manager is the *ROS Package* which tells Arm Master where it should be pla
 the function being used asks for the number of the brick being placed, finds the coordinates and orientation the end effector needs to place that brick and
 sends it back to Arm Master.
 
-This package is run from the python file `brick_manager_server.py` and this will be the focus of explanation. There is, however, a second script that was not implemented in the end,
-`SamRowan.py`and this will also be briefly covered.
+This package is run from the python file ``brick_manager_server.py`` and this will be the focus of explanation. There is, however, a second script that was not implemented in the end,
+``SamRowan.py`` and this will also be briefly covered.
 
 File Structure
 -----------------
@@ -21,18 +21,14 @@ brick_manager
 └── package.xml
 
 
-The package itself is incredibly simple. Within the scrips section only two python scripts exist, brick_manager_serve.py and samrowan.py; both of these will be discussed later on.
+The package itself is incredibly simple. Within the scrips section only two python scripts exist, ``brick_manager_serve.py`` and ``samrowan.py``; both of these will be discussed later on.
 
 
-Main Control Loop
+brick_manager_server and it's Functions
 -----------------------------------
 
-Once running, the Panda arm loops through a control sequence defined in `arm_master_main.py`_,
-which calls services and publishes to topics defined in ``move_arm_server.py``
-
-To understand what is happening in this control sequence, I will go line by line through the important information and explain
-the necessary concepts required.
-
+Within brick_manager_server there are three functions which could be used to generate the brick. In summary the first of these runs from a hardcoded list of positions
+whilst the second and third generate the wall based on a predefined base width and number of bricks.
 
 real_panda
 -----------------------------------
