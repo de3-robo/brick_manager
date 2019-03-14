@@ -38,7 +38,6 @@ def brick_manager_server(req):
 def goal_manager_server(req):
 
     num = req.num
-    new = False
 
     #p, new = GoalManager.get_next_goal_loc(num)    #SAM DO CODE AND LOGIC IN HERE #Start with one value in here to avoid errors
     #     # while not new: #Query untill you get a new position

@@ -54,7 +54,9 @@ The First Function: goal_manager_server
 -----------------------------------
 
 This first set of brick positions was generated so that the other packages could be tested whilst this one was developed. In essence it is a pre-defined set of
-positions which gets run through in increments of one, as each brick is successfully placed. The function can be seen bellow::
+positions which gets run through in increments of one, as each brick is successfully placed. This 'brick number' is iterated through in the main loop of Arm Master and received through a service in Brick Manager.
+
+The function will be discussed in two halves; the start which
 
 
 
