@@ -97,133 +97,63 @@ Finally, ``rospy.spin()`` prevents the python script from closing and allows the
 
     rospy.spin()
 
-real_panda
+The Second Function: goal_manager_server2
 -----------------------------------
 
-At the start of the runnable code, a variable ``real_panda`` is defined::
+The second function works much the same way as the first; it receives the brick number from Arm Master and returns the positions in the same way.
+However, this code generates it's positions based off an algorithm instead of pre-defined locations.
 
-    # ----------------------------------------------
-    real_panda = True
-    # ----------------------------------------------
+This section will simply talk about the generation algorithm, since the implementation is the same. The first section of the algorithm is shown bellow::
 
-It is essential this is set correctly depending on weather you wish to run the code on *Gazebo* or on the real *Franka Panda*.
+    #pose of first brick in wall, cornerstone
+    xstart=1
+    ystart=-0.8
+    zstart=0.116
+    xtheta=0
+    ytheta=0
+    ztheta= pi/2
 
+    #geometry of the brick
+    blength = 0.2
+    bwidth = 0.09
+    bheight = 0.06
+    angle = pi/2  #90 degree rotation
 
-Setting this variable to ``False``, ensures that the code doesn't wait for services from the real robot which will
-not appear on the ROS network
+    #puts pose into the list
+    bstart=[xstart,ystart,zstart,xtheta,ytheta,ztheta]
 
-.. warning::
-   The ``real_panda`` variable also needs to be set in `move_arm_server.py`_
+    #initiates list that will contain all the brick poses
+    pos_list = []   #initate the list
 
-.. warning::
-   If you find that the code is not running and is getting hanged up at launch time it could be because the arm_master node
-   is waiting for all the required nodes to be launched. Double check ``real_panda`` is correctly set.
+    input_nos = 15                  #input the number of bricks in wall
+    input_width = 5                 #input the number of bricks long the wall will be
+    brick_number = int(input_nos)
+    width = int(input_width)
+    width1= math.ceil(width/2)
+    shift1=(blength+bwidth)/2
+    shift2=(blength-bwidth)/2
+    round_up = brick_number
 
-   Note that the code calls ``rospy.wait_for_service()`` each time it is required to connect to another service
-   or action client::
+    #initating counters to help design the wall
+    xnos = 0
+    znos = 0
 
-        def connect_srv(name, msg_type):
+    round_up = brick_number
 
-            rospy.loginfo("Searching for " + name + " .... ")
-            rospy.wait_for_service(name)
-            srv_wrapper = rospy.ServiceProxy(name, msg_type)
-            rospy.loginfo(name + " CONNECTED")
-            return srv_wrapper
+    #adding tolerances to the wall design
+    tol = 0.02
+    blength = blength + tol
+    bheight = bheight + tol
 
-
-Loop
------------------------------------
-The main loop has the following structure::
-
-  #Continue to loop until you have placed the correct number of bricks
-  while not rospy.is_shutdown():
-        if placed < num_bricks:
-
-            #Query Positions
-            brick = get_brick_pos()
-            goal = get_goal_pos()
-
-            #Move towards brick and pick up
-            pick_up(brick)
-
-            #Move from pick up positon to place down position
-            move_towards(brick, goal)
-
-            #Place down brick
-            place_down(goal)
-
-            # Increment num of brick placed
-            placed += 1
+This section of code could have been broken into smaller chunks to explain, but it is in essence incredibly simple. All this section does
+is set the definitions for a start position, the geometry of the brick, establish the brick start position as an array, initiate an empty list to be built upon,
+establish the size the wall will be built to and give tolerances to the brick positions so they do not touch and will therefore not interfere when placed. Whilst
+this does sound like a lot it is all simply definitions for the generative alogorithm.
 
 
-If you wish to change how the arm moves, change the order in which the ``pick_up()``, ``place_down()``, ``place_down()``
-functions are called. Additional motion functions also available in ``arm_master_main.py`` are ``go_to()`` and ``move_arm_curve()``. To illustrate,
-The main loop for our project implementation was implemented as follows::
 
-     while not rospy.is_shutdown():  # Main Control Loop for the arm
-            if placed < num_bricks:  # Continue to loop until you have placed the correct number of bricks
-
-                # Query Positions
-                brick = get_brick_pos(placed)
-                goal = get_goal_pos(placed)
-
-                if goal == last_goal:  # same as last time, don't go back
-                    continue
-                home = get_home_pos()
-                over_head = get_over_pos()
-
-                if not real_panda:
-                    gen_brick()
-                succ = move_towards(home, brick, circle_points)
-
-                # Pick Place operation then return home
-
-                pick_up(brick)
-                succ = move_towards(brick, goal, circle_points, check=False)
-
-                if not real_panda: #Functionality to return to brick location if you dropped it.
-                    if not succ:
-                        brick_via = brick
-                        brick_via[2] += 0.2
-                        go_to(brick_via)
-                        continue #continue, don't increment placed
-
-                place_down(goal)
-
-                succ = move_towards(goal, home, circle_points)
-                placed += 1
-                last_goal = goal  # placed down now its a last brick
-
-                rospy.loginfo("Placed")
-                # Place another brick from stack onto wall
-
-            else:  # When done just wait
-                rospy.loginfo("Done, " + str(placed) + " bricks placed")
-            rate.sleep()
-
-
-Behind the Scenes
+The Third Function: goal_manager_server3
 -----------------------------------
 
-I will now explain more of the theoretical aspects of what happens when a motion function like ``pick_up()`` is called in
-``arm_master_main.py``.
-
-Pick Up
-++++++++++++++++++++++
-
-The pick up function in full is::
-
-    def pick_up(target, via_offset=0.3):
-
-        global holding_brick  # use global var
-
-        # First Move to point above the pick up location
-        via_point = copy.deepcopy(target)
-        via_point[2] += via_offset  # Z offset
-
-        move_arm(via_point)  # Move arm to just above goal
-        move_arm(target)  # Lower arm down to goal
-        # rospy.sleep(0.5) # Play with timming in here to get desired behaviour
-        close_gripper()  # Grasp around brick
-
-        holding_brick = True
+The final function, ``goal_manager_server3`` works in the same way as ``goal_manager_server2`` in the sense it generates the wall coordinates as it goes.
+This section will simply talk about the differences in generation technique and the resulting shape.
