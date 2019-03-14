@@ -1,15 +1,12 @@
 Brick Manager Server
 ========================
 
-*"I am the master of my fate: I am the captain of my soul."*
+Brick Manager is the *ROS Package* which tells Arm Master where it should be placing each of the bricks. As a brief summary
+the function being used asks for the number of the brick being placed, finds the coordinates and orientation the end effector needs to place that brick and
+sends it back to Arm Master.
 
-*- William Ernest Henley*
-
-Arm Master is the *ROS Package* which controls the arm. At the most basic level, its purpose is to query goal
-end effector poses, and then move the arm from the current position to meet the new goal.
-
-Code for this computation is located in *python* scripts. Some of these scripts exposes them selves as ROS node, but their are also some scripts that simply
-provide pure *python* function calls.
+This package is run from the python file `brick_manager_server.py` and this will be the focus of explanation. There is, however, a second script that was not implemented in the end,
+`SamRowan.py`and this will also be briefly covered.
 
 File Structure
 -----------------
@@ -24,11 +21,7 @@ brick_manager
 └── package.xml
 
 
-Launch files `light.launch`_, `panda_one_brick.launch`_, `sim.launch`_ run all necessary ros nodes.
-Refer to **Getting Started** for more information on running the code
-
-The *scripts* are structured such that there is a script which defines the ROS related code, and a script which provides ROS free functions. To illustrate observe the difference between
-``arm_master_main.py`` and ``arm_master_functions.py``
+The package itself is incredibly simple. Within the scrips section only two python scripts exist, brick_manager_serve.py and samrowan.py; both of these will be discussed later on.
 
 
 Main Control Loop
