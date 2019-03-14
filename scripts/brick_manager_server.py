@@ -87,7 +87,7 @@ def goal_manager_server(req):
     resp = QueryBrickLocResponse()
     resp.x = p[0]
     resp.y = p[1]
-    resp.z = p[2] - 0.13 #Offset for table height
+    resp.z = p[2] #- 0.13 #Offset for table height
     resp.wx = p[3]
     resp.wy = p[4]
     resp.wz = p[5]
